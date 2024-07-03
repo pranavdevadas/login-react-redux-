@@ -1,15 +1,13 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import { Form, Button } from "react-bootstrap";
 import FormContainer from "../components/FormContainer";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Loader from "../components/Loader";
 import { setCredentials } from "../slices/authSlice";
-import { useNavigate } from "react-router-dom";
 import { useUpdateUserMutation } from "../slices/usersApiSlice";
-const PROFILE_IMAGE_DIR_PATH = 'http://localhost:5001/UserProfileImages/'
 
+const PROFILE_IMAGE_DIR_PATH = 'http://localhost:5001/UserProfileImages/';
 
 const ProfileScreen = () => {
   const [name, setName] = useState("");
@@ -18,54 +16,56 @@ const ProfileScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [profileImageName, setProfileImageName] = useState("");
 
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
-  const [updateProfile, { isLoading }] = useUpdateUserMutation()
+  const [updateProfile, { isLoading }] = useUpdateUserMutation();
+
   useEffect(() => {
     setName(userInfo.name);
     setEmail(userInfo.email);
     setProfileImageName(userInfo.profileImageName);
-  }, [userInfo.setName, userInfo.setEmail,userInfo.profileImageName]);
+  }, [userInfo]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const nameRegex = /^[a-zA-Z]{3,}$/
+    const nameRegex = /^[a-zA-Z]{3,}$/;
 
     if (!nameRegex.test(name)) {
-      toast.error('Please enter a valid name');
+      toast.error("Please enter a valid name");
       return;
     }
-    if(!nameRegex.test(name)){
-      toast.error('Name is not valid')
-      return
-    }
-    if(!emailRegex.test(email)){
-      toast.error("Email Not Valid")
-      return
-    }
-    if (password.length < 6) {
-      toast.error('Password must be at least 6 characters long');
+
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email");
       return;
     }
-    if (password !== confirmPassword) {
-      toast.error("Passwords donot match");
-    } else {
-     try {
+
+    try {
       const formData = new FormData();
 
       formData.append('name', name);
       formData.append('email', email);
-      formData.append('password', password);
       formData.append('profileImageName', profileImageName);
-  const responseFromApiCall = await updateProfile(formData).unwrap();
-  dispatch(setCredentials({...responseFromApiCall}))
-  toast.success('Profile Updated Succesfully')
-     } catch (error) {
-        console.log(error.data.message);
-        toast.error("An error occured")
-     }
+
+      if (password) {
+        if (password.length < 6) {
+          toast.error("Password must be at least 6 characters long");
+          return;
+        }
+        if (password !== confirmPassword) {
+          toast.error("Passwords do not match");
+          return;
+        }
+        formData.append('password', password);
+      }
+
+      const responseFromApiCall = await updateProfile(formData).unwrap();
+      dispatch(setCredentials({...responseFromApiCall}));
+      toast.success("Profile Updated Successfully");
+    } catch (error) {
+      console.log(error.data.message);
+      toast.error("An error occurred");
     }
   };
 
@@ -77,14 +77,11 @@ const ProfileScreen = () => {
           alt={userInfo.name}
           style={{
             width: "150px",
-            justifyContent:"center",
             height: "150px",
             borderRadius: "50%",
             objectFit: "cover",
             display: "block",
-            marginTop: "5px",
-            marginLeft: "115px",
-            marginBottom: "10px",
+            margin: "10px auto",
           }}
         />
       )}
@@ -97,7 +94,7 @@ const ProfileScreen = () => {
             placeholder="Enter name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-          ></Form.Control>
+          />
         </Form.Group>
 
         <Form.Group className="my-2" controlId="email">
@@ -107,7 +104,7 @@ const ProfileScreen = () => {
             placeholder="Enter email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-          ></Form.Control>
+          />
         </Form.Group>
 
         <Form.Group className="my-2" controlId="password">
@@ -117,8 +114,9 @@ const ProfileScreen = () => {
             placeholder="Enter password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-          ></Form.Control>
+          />
         </Form.Group>
+
         <Form.Group className="my-2" controlId="confirmPassword">
           <Form.Label>Confirm Password</Form.Label>
           <Form.Control
@@ -126,18 +124,18 @@ const ProfileScreen = () => {
             placeholder="Confirm password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-          ></Form.Control>
+          />
         </Form.Group>
 
         <Form.Group className="my-2" controlId="profileImage">
-              <Form.Label>Profile Picture</Form.Label>
-              <Form.Control
-                type="file"
-                onChange={(e) => setProfileImageName(e.target.files[0])}
-              ></Form.Control>
-            </Form.Group>
+          <Form.Label>Profile Picture</Form.Label>
+          <Form.Control
+            type="file"
+            onChange={(e) => setProfileImageName(e.target.files[0])}
+          />
+        </Form.Group>
 
-        {isLoading && <Loader/>}
+        {isLoading && <Loader />}
 
         <Button type="submit" variant="primary" className="mt-3">
           Update
