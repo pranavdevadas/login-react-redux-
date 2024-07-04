@@ -43,8 +43,7 @@ export const UsersTable = ({ users, refetchData }) => {
       user.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const [updateUserByAdmin, { isLoading: isUpdating }] =
-    useAdminUpdateUserMutation();
+  const [updateUserByAdmin, { isLoading: isUpdating }] = useAdminUpdateUserMutation();
   const [deleteUserByAdmin] = useDeleteUserDataMutation();
 
   const handleOpenUpdateModal = (user) => {

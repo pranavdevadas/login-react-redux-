@@ -1,6 +1,5 @@
 import { Container, Card } from 'react-bootstrap';
 
-
 const Hero = () => {
   return (
     <div className=' py-5'>
@@ -10,7 +9,6 @@ const Hero = () => {
           <p className='text-center mb-4'>
             Welcome to the Home page
           </p>
-          
         </Card>
       </Container>
     </div>
